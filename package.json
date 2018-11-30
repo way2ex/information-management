@@ -1,0 +1,17 @@
+{
+  "name": "information-management",
+  "version": "1.0.0",
+  "description": "a project for logistics information management",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "nodejs",
+    "koa",
+    "vue"
+  ],
+  "author": "zhuqingguang",
+  "license": "ISC",
+  "dependencies": {}
+}

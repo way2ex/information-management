@@ -1,0 +1,24 @@
+.p10 {
+    padding: 10px;
+}
+.ph10 {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.pv10 {
+    padding-top: 10px;
+    padding-bottom: 10;
+}
+
+.m10 {
+    margin: 10px;
+}
+.mh10 {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.mv10 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
