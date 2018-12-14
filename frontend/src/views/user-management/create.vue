@@ -81,7 +81,7 @@ export default {
           { validator: validatePass, trigger: 'blur' }
         ],
         repassword: [
-           { validator: validatePass2, trigger: 'blur' }
+          { validator: validatePass2, trigger: 'blur' }
         ],
         department: [
           { required: true, message: '请输入部门名称', trigger: 'blur' }
@@ -104,7 +104,7 @@ export default {
         if (valid) {
           let form = { ...this.form };
           delete form.repassword;
-          let res = await ajax.post('/user', form);
+          await ajax.post('/user', form);
           this.$message({
             type: 'success',
             message: '创建成功！'

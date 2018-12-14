@@ -17,6 +17,10 @@ import UM_LIST from '@/views/user-management/list';
 import UM_CREATE from '@/views/user-management/create';
 import UM_UPDATE from '@/views/user-management/update';
 
+import Purchase from '@/views/purchase-management';
+import PURCHASE_LIST from '@/views/purchase-management/list';
+import PURCHASE_CREATE from '@/views/purchase-management/create';
+
 Vue.use(Router);
 const router = new Router({
   routes: [
@@ -32,28 +36,25 @@ const router = new Router({
         //   path: '',
         //   redirect: 'im'
         // },
-        // {
-        //   path: 'im',
-        //   component: IM,
-        //   meta: { name: '接口管理' },
-        //   children: [
-        //     {
-        //       path: '',
-        //       redirect: 'list'
-        //     },
-        //     {
-        //       path: 'list',
-        //       component: IM_LIST,
-        //       name: 'im'
-        //     },
-        //     {
-        //       path: 'create',
-        //       component: IM_CREATE,
-        //       name: 'im-create',
-        //       meta: { name: '新建接口' }
-        //     }
-        //   ]
-        // },
+        {
+          path: 'purchase',
+          component: Purchase,
+          meta: { name: '采购管理' },
+          children: [
+            {
+              path: '',
+              component: PURCHASE_LIST,
+              name: 'purchase',
+              meta: { activeMenuItem: '/main/purchase' }
+            },
+            {
+              path: 'create',
+              component: PURCHASE_CREATE,
+              name: 'purchase-create',
+              meta: { name: '申请采购', activeMenuItem: '/main/purchase' }
+            }
+          ]
+        },
         {
           path: 'um',
           component: UM,

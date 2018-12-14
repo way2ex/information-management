@@ -1,5 +1,6 @@
 const Router = require('koa-router');
 const User = require('./User');
+const Purchase = require('./Purchase');
 const router = new Router();
 const UserCtrl = require('../controller/User');
 
@@ -25,4 +26,5 @@ router.post('/login', async (ctx) => {
   }
 });
 router.use('/user', User.routes(), User.allowedMethods());
+router.use('/purchase', Purchase.routes(), Purchase.allowedMethods());
 module.exports = router;

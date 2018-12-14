@@ -7,7 +7,7 @@ export default {
         {
           type: 'single',
           title: '采购管理',
-          iconClass: 'fa-diamond',
+          iconClass: 'fa-shopping-cart',
           index: '/main/purchase'
         },
         {

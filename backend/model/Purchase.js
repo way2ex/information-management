@@ -6,15 +6,17 @@ autoIncrement.initialize(mongoose.connection);
 
 const PurchaseScheme = new mongoose.Schema({
   uniqueCode: String,
-  goodsName: String,
-  packingSpec: String,
-  amount: Number,
-  price: Number,
-  provider: String,
+  // goodsName: String,
+  // packingSpec: String,
+  // amount: String,
+  // price: String,
+  // provider: String,
   purchaser: String,
   purchasingDate: String,
-  state: String,
-  extra: String
+  state: Number,
+  stateText: String,
+  extra: String,
+  goodsList: Array
 });
 
 mongoose.plugin(mongoosePaginate);
