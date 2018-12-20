@@ -3,6 +3,7 @@ const User = require('./User');
 const Purchase = require('./Purchase');
 const router = new Router();
 const UserCtrl = require('../controller/User');
+const WMSCtrl = require('./wms/index');
 
 router.post('/login', async (ctx) => {
   let user = await UserCtrl.findOne(ctx);
@@ -27,4 +28,6 @@ router.post('/login', async (ctx) => {
 });
 router.use('/user', User.routes(), User.allowedMethods());
 router.use('/purchase', Purchase.routes(), Purchase.allowedMethods());
+router.use('/wms', WMSCtrl.routes(), WMSCtrl.allowedMethods());
+
 module.exports = router;

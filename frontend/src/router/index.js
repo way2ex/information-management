@@ -21,6 +21,11 @@ import Purchase from '@/views/purchase-management';
 import PURCHASE_LIST from '@/views/purchase-management/list';
 import PURCHASE_CREATE from '@/views/purchase-management/create';
 
+import StockIn from '@/views/wms/stock-in';
+import StockInReqLIST from '@/views/wms/stock-in/stock-in-req';
+
+import GoodsManagement from '@/views/wms/goods-management/index';
+
 Vue.use(Router);
 const router = new Router({
   routes: [
@@ -52,6 +57,25 @@ const router = new Router({
               component: PURCHASE_CREATE,
               name: 'purchase-create',
               meta: { name: '申请采购', activeMenuItem: '/main/purchase' }
+            }
+          ]
+        },
+        {
+          path: 'wms',
+          component: StockIn,
+          meta: { name: '仓储管理' },
+          children: [
+            {
+              path: 'stock-in-req',
+              component: StockInReqLIST,
+              name: 'stock-in-req',
+              meta: { name: '入库管理', activeMenuItem: '/main/wms/stock-in-req' }
+            },
+            {
+              path: 'goods-management',
+              component: GoodsManagement,
+              name: 'goods-management',
+              meta: { name: '库存商品管理', activeMenuItem: '/main/wms/goods-management' }
             }
           ]
         },

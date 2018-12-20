@@ -41,29 +41,22 @@
       class="table">
       <el-table-column type="expand">
         <template slot-scope="props">
-          <el-table :data="props.row.goodsList" border>
+          <el-table :data="props.row.goodsList" border size="small">
             <el-table-column label="商品名称" prop="goodsName"></el-table-column>
-            <el-table-column label="单价" prop="price"></el-table-column>
+            <el-table-column label="单价(元)" prop="price"></el-table-column>
             <el-table-column label="数量" prop="amount"></el-table-column>
-            <el-table-column label="总价" prop="totalPrice"></el-table-column>
+            <el-table-column label="总价(元)" prop="totalPrice"></el-table-column>
             <el-table-column label="供应商" prop="provider"></el-table-column>
             <el-table-column label="状态" prop="stateText"></el-table-column>
             <el-table-column label="操作" width="80">
               <template slot-scope="scope">
-                <el-button :disabled="scope.row.state !== 1" size="mini" type="text">签收</el-button>
+                <el-button :disabled="scope.row.state !== 1" size="mini" type="text" @click.native.prevent="sign(props.row, scope.row.id)">签收</el-button>
               </template>
             </el-table-column>
           </el-table>
         </template>
       </el-table-column>
       <el-table-column prop="uniqueCode" label="采购编号"></el-table-column>
-      <!-- <el-table-column prop="goodsName" label="商品名称"></el-table-column>
-      <el-table-column prop="packingSpec">
-        <slot name="label">包装规格<br>(cm3)</slot>
-      </el-table-column>
-      <el-table-column prop="amount" label="数量(台)" width="50"></el-table-column>
-      <el-table-column prop="price" label="单价(元)" width="70"></el-table-column>
-      <el-table-column prop="provider" label="供应商"></el-table-column> -->
       <el-table-column prop="purchaser" label="采购员"></el-table-column>
       <el-table-column prop="purchasingDate" label="采购日期"></el-table-column>
       <el-table-column prop="stateText" label="当前状态"></el-table-column>
@@ -75,14 +68,14 @@
         <template slot-scope="scope">
           <el-button
             :disabled="scope.row.state !== 0"
-            @click.native.prevent="check(scope.$index, tableData)"
+            @click.native.prevent="check(scope.row)"
             type="text"
             size="small">
             审核
           </el-button>
           <el-button
             :disabled="scope.row.state !== 1"
-            @click.native.prevent="sign(scope.$index, tableData)"
+            @click.native.prevent="sign(scope.row)"
             type="text"
             size="small">签收全部
           </el-button>
@@ -147,9 +140,9 @@ export default {
     selectionChange (selection) {
       this.deleteItems = selection.map(v => v._id);
     },
-    async check (index, rows) {
+    async check (row) {
       await ajax.post('/purchase/check', {
-        uniqueCode: rows[index].uniqueCode
+        uniqueCode: row.uniqueCode
       });
       this.$message({
         type: 'success',
@@ -157,9 +150,11 @@ export default {
       });
       this.getPurchase();
     },
-    async sign (index, rows) {
+    async sign (row, id) {
       await ajax.post('/purchase/sign', {
-        uniqueCode: rows[index].uniqueCode
+        uniqueCode: row.uniqueCode,
+        username: sessionStorage.getItem('username'),
+        id
       });
       this.$message({
         type: 'success',

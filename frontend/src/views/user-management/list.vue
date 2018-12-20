@@ -36,7 +36,7 @@
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="6" class="tal" label-width="70px" label-position="right">
+        <el-col :span="6" class="tal">
           <el-form-item>
             <el-button type="primary" @click="getUsers(queryForm)">查询</el-button>
           </el-form-item>
@@ -44,7 +44,7 @@
       </el-row>
     </el-form>
     <el-table
-      :data="tableData" border @selection-change="selectionChange"
+      :data="tableData" border @selection-change="selectionChange" size="medium"
       class="table">
       <el-table-column
         type="selection"
@@ -62,7 +62,7 @@
         width="70">
         <template slot-scope="scope">
           <el-button
-            @click.native.prevent="updateRow(scope.$index, tableData)"
+            @click.native.prevent="updateRow(scope.row)"
             type="text"
             size="small">
             修改
@@ -105,7 +105,7 @@ export default {
       condition.currentPage = this.pageInformation.currentPage;
       condition.pageSize = this.pageInformation.pageSize;
       ajax
-        .get("/user", {
+        .get('/user', {
           params: condition
         })
         .then(data => {
@@ -127,7 +127,7 @@ export default {
     selectionChange (selection) {
       this.deleteItems = selection.map(v => v._id);
     },
-    async deleteSelection() {
+    async deleteSelection () {
       if (!this.deleteItems.length) {
         this.$message({
           type: 'error',
@@ -144,8 +144,8 @@ export default {
       });
       this.getUsers();
     },
-    async updateRow(index, rows) {
-      this.$router.push({ name: 'um-update', params: { id: rows[index].username } });
+    async updateRow(row) {
+      this.$router.push({ name: 'um-update', params: { id: row.username } });
     }
   }
 };

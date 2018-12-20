@@ -11,6 +11,24 @@ export default {
           index: '/main/purchase'
         },
         {
+          type: 'composite',
+          title: '仓储管理',
+          iconClass: 'fa-home',
+          index: '/main/wms/',
+          children: [
+            {
+              title: '入库管理',
+              index: '/main/wms/stock-in-req',
+              iconClass: 'fa-home'
+            },
+            {
+              title: '库存商品管理',
+              index: '/main/wms/goods-management',
+              iconClass: 'fa-cubes'
+            }
+          ]
+        },
+        {
           type: 'single',
           title: '用户管理',
           index: '/main/um',
@@ -170,7 +188,7 @@ export default {
     /* bottom: -@settingMenuHeight; */
   }
 
-  .el-menu-item .fa {
+  .el-menu-item-group .fa, .el-menu-item .fa {
     line-height: 16px;
     font-size: 16px;
     height: 16px;

@@ -1,7 +1,9 @@
+const dateTime = require('date-time');
 const Purchase = require('../model/Purchase');
-
+const StockinRequisition = require('../model/wms/StockinRequisition');
 /**
- * 创建新的订购单
+ * 创建新的订购单''
+ * goodsList: [{ id: 1, goodsName: '', amount: 10, price: '', totalPrice: '', state: 1, stateText: '' }]
  */
 async function createOne (ctx) {
   let { purchaser, purchasingDate, state, stateText, extra, goodsList } = ctx.request.body;
@@ -56,11 +58,47 @@ async function check (ctx) {
  * 签收采购
  */
 async function sign (ctx) {
-  let uniqueCode = ctx.request.body.uniqueCode;
-  await Purchase.update({ uniqueCode }, { state: 2, stateText: '已签收' });
+  let { uniqueCode, id, username } = ctx.request.body;
+  let data = await Purchase.findOne({ uniqueCode });
+  let newRequisitionParams = {
+    applicatingDate: dateTime(),
+    state: 0,
+    stateText: '未处理',
+    processor: '',
+    extra: ''
+  };
+
+  if (!id) {
+    data.goodsList.forEach(v => {
+      v.state = 2;
+      v.stateText = '已签收';
+    });
+    await Purchase.update({ uniqueCode }, { state: 3, stateText: '全部签收', goodsList: data.goodsList });
+    // 生成入库申请
+    let goodsList = data.goodsList.map(v => ({ id: v.id, goodsName: v.goodsName, amount: v.amount }));
+    let newUniqueCode = +new Date();
+    const newRequisition = new StockinRequisition({
+      uniqueCode: newUniqueCode, goodsList, applicant: username, ...newRequisitionParams
+    });
+    await newRequisition.save();
+  } else {
+    let goods = data.goodsList.find((v) => { return v.id === +id; });
+    goods.state = 1;
+    goods.stateText = '已签收';
+    await Purchase.update({ uniqueCode }, { state: 2, stateText: '部分签收', goodsList: data.goodsList });
+
+    // 生成入库申请
+    let newUniqueCode = +new Date();
+    let goodsList = [{ id: goods.id, goodsName: goods.name, amount: goods.amount }];
+    const newRequisition = new StockinRequisition({
+      uniqueCode: newUniqueCode, goodsList, applicant: username, ...newRequisitionParams
+    });
+    await newRequisition.save();
+  }
+
   ctx.body = {
     result: 1,
-    msg: '签收成功'
+    msg: '签收成功, 已生成入库单'
   };
 }
 module.exports = {

@@ -28,6 +28,7 @@
     </el-form>
     <el-table border :data="goodsList" @selection-change="selectionChange">
       <el-table-column type="selection" ></el-table-column>
+      <el-table-column label="商品编号" prop="uniqueCode"></el-table-column>
       <el-table-column label="商品名称" prop="goodsName"></el-table-column>
       <el-table-column label="单价" prop="price"></el-table-column>
       <el-table-column label="数量" prop="amount"></el-table-column>
@@ -38,14 +39,33 @@
       <el-form :model="addGoodsForm" label-position="right" label-width="80px"
         :rules="addGoodsRules" ref="addGoodsForm">
         <el-row justify="start" type="flex">
-          <el-col :span="12"><el-form-item label="商品名称" prop="goodsName"><el-input v-model="addGoodsForm.goodsName"></el-input></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="单价" prop="price"><el-input v-model="addGoodsForm.price" @change="calculateTotal"><i slot="prefix" class="fa fa-yen-sign"></i></el-input></el-form-item></el-col>
+          <el-col :span="12">
+            <el-form-item label="商品名称" prop="goodsName">
+              <el-autocomplete v-model="addGoodsForm.goodsName" :fetch-suggestions="fetchSuggestions" popper-class="goods-name-popper">
+                <template slot-scope="{ item }">
+                  <div class="name">{{item.goodsName}}</div>
+                  <span class="unique-code">{{item.uniqueCode}}</span>
+                </template>
+              </el-autocomplete>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="商品编号" prop="uniqueCode">
+              <el-autocomplete v-model="addGoodsForm.uniqueCode" :fetch-suggestions="fetchSuggestions" popper-class="unique-code-popper">
+                <template slot-scope="{ item }">
+                  <div class="unique-code">{{item.uniqueCode}}</div>
+                  <span class="name">{{item.goodsName}}</span>
+                </template>
+              </el-autocomplete>
+            </el-form-item>
+          </el-col>
         </el-row>
         <el-row justify="start" type="flex">
+          <el-col :span="12"><el-form-item label="单价" prop="price"><el-input v-model="addGoodsForm.price" @change="calculateTotal"><i slot="prefix" class="fa fa-yen-sign"></i></el-input></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="数量" prop="amount"><el-input v-model="addGoodsForm.amount" @change="calculateTotal"></el-input></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="总价" prop="totalPrice"><el-input v-model="addGoodsForm.totalPrice" readonly ><i slot="prefix" class="fa fa-yen-sign"></i></el-input></el-form-item></el-col>
         </el-row>
         <el-row>
+          <el-col :span="12"><el-form-item label="总价" prop="totalPrice"><el-input v-model="addGoodsForm.totalPrice" readonly ><i slot="prefix" class="fa fa-yen-sign"></i></el-input></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="供应商" prop="provider"><el-input v-model="addGoodsForm.provider"></el-input></el-form-item></el-col>
         </el-row>
         <el-row>
@@ -67,6 +87,7 @@ export default {
         extra: ''
       },
       addGoodsForm: {
+        uniqueCode: '',
         goodsName: '笔记本电脑',
         price: '4000.00',
         amount: 10,
@@ -170,6 +191,20 @@ export default {
     },
     selectionChange (selection) {
       this.selection = selection.map(v => v.id);
+    },
+    fetchNameSuggestions (queryString, cb) {
+      return this.fetchSuggestions('goodsName');
+    },
+    fetchCodeSuggestions (queryString, cb) {
+      return this.fetchSuggestions('uniqueCode');
+    },
+    async fetchSuggestions (type, queryString, cb) {
+      let params = {};
+      params[type] = queryString;
+      let result = await ajax.get('/wms/mini-goods-list', {
+        params
+      });
+      cb(result);
     }
   }
 };
@@ -179,6 +214,30 @@ export default {
   margin: auto;
   .el-select {
     width: 100%;
+  }
+}
+.goods-name-popper {
+  li {
+    .name {
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    .unique-code {
+      font-size: 12px;
+      color: #b4b4b4;
+    }
+  }
+}
+.unique-code-popper {
+  li {
+    .unique-code {
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    .name {
+      font-size: 12px;
+      color: #b4b4b4;
+    }
   }
 }
 </style>
