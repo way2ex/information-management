@@ -1,17 +1,12 @@
 <template>
   <div>
     <el-row justify="start" type="flex" class="tal mv10">
-      <el-col :span="2"><el-button type="primary" @click="handleAddGoods">添加商品</el-button></el-col>
-      <el-col :span="2"><el-button type="primary" @click="submitForm('form')">确定申请</el-button></el-col>
+      <el-col :span="3"><el-button type="primary" @click="handleAddGoods">添加商品</el-button></el-col>
+      <el-col :span="3"><el-button type="primary" @click="submitForm('form')">确定申请</el-button></el-col>
     </el-row>
     <el-form :model="form" :rules="rules" ref="form"
       class="form" label-position="right" label-width="80px">
       <el-row type="flex" justify="start">
-        <el-col :span="6">
-          <el-form-item label="仓库名称" prop="houseName">
-            <el-input v-model="form.houseName"></el-input>
-          </el-form-item>
-        </el-col>
         <el-col :span="6">
           <el-form-item label="采购员" prop="purchaser">
             <el-input v-model="form.purchaser" readonly></el-input>
@@ -35,13 +30,13 @@
       <el-table-column label="总价" prop="totalPrice"></el-table-column>
       <el-table-column label="供应商" prop="provider"></el-table-column>
     </el-table>
-    <el-dialog width="60%" title="添加商品" :visible="isAddGoodsShow" :before-close="handleClose">
+    <el-dialog width="60%" title="添加商品" :visible="isAddGoodsShow" :before-close="handleClose" class="create-purchase-dlg">
       <el-form :model="addGoodsForm" label-position="right" label-width="80px"
         :rules="addGoodsRules" ref="addGoodsForm">
         <el-row justify="start" type="flex">
           <el-col :span="12">
             <el-form-item label="商品名称" prop="goodsName">
-              <el-autocomplete v-model="addGoodsForm.goodsName" :fetch-suggestions="fetchSuggestions" popper-class="goods-name-popper">
+              <el-autocomplete @select="handleSelect" v-model="addGoodsForm.goodsName" :fetch-suggestions="fetchSuggestions" popper-class="goods-name-popper">
                 <template slot-scope="{ item }">
                   <div class="name">{{item.goodsName}}</div>
                   <span class="unique-code">{{item.uniqueCode}}</span>
@@ -51,7 +46,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="商品编号" prop="uniqueCode">
-              <el-autocomplete v-model="addGoodsForm.uniqueCode" :fetch-suggestions="fetchSuggestions" popper-class="unique-code-popper">
+              <el-autocomplete @select="handleSelect" v-model="addGoodsForm.uniqueCode" :fetch-suggestions="fetchSuggestions" popper-class="unique-code-popper">
                 <template slot-scope="{ item }">
                   <div class="unique-code">{{item.uniqueCode}}</div>
                   <span class="name">{{item.goodsName}}</span>
@@ -82,13 +77,12 @@ export default {
     return {
       isAddGoodsShow: false,
       form: {
-        houseName: '',
         purchaser: sessionStorage.getItem('username'),
         extra: ''
       },
       addGoodsForm: {
-        uniqueCode: '',
-        goodsName: '笔记本电脑',
+        uniqueCode: '1545227890270',
+        goodsName: '三星液晶高清显示器',
         price: '4000.00',
         amount: 10,
         totalPrice: '40000.00',
@@ -146,7 +140,8 @@ export default {
             type: 'success',
             message: '申请成功，请耐心等待审核！'
           });
-          // this.resetForm('form');
+          this.$refs['form'].resetFields();
+          this.goodsList = [];
         }
       });
     },
@@ -192,19 +187,16 @@ export default {
     selectionChange (selection) {
       this.selection = selection.map(v => v.id);
     },
-    fetchNameSuggestions (queryString, cb) {
-      return this.fetchSuggestions('goodsName');
-    },
-    fetchCodeSuggestions (queryString, cb) {
-      return this.fetchSuggestions('uniqueCode');
-    },
-    async fetchSuggestions (type, queryString, cb) {
-      let params = {};
-      params[type] = queryString;
+    async fetchSuggestions (queryString, cb) {
+      let params = { keyword: queryString };
       let result = await ajax.get('/wms/mini-goods-list', {
         params
       });
       cb(result);
+    },
+    handleSelect (item) {
+      this.addGoodsForm.goodsName = item.goodsName;
+      this.addGoodsForm.uniqueCode = item.uniqueCode;
     }
   }
 };
@@ -239,5 +231,10 @@ export default {
       color: #b4b4b4;
     }
   }
+}
+</style>
+<style lang="less">
+.create-purchase-dlg .el-autocomplete {
+  width: 100%;
 }
 </style>

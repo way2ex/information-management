@@ -3,7 +3,7 @@ const Purchase = require('../model/Purchase');
 const StockinRequisition = require('../model/wms/StockinRequisition');
 /**
  * 创建新的订购单''
- * goodsList: [{ id: 1, goodsName: '', amount: 10, price: '', totalPrice: '', state: 1, stateText: '' }]
+ * goodsList: [{ id: 1, goodsName: '', uniqueCode: '', amount: 10, price: '', totalPrice: '', state: 1, stateText: '' }]
  */
 async function createOne (ctx) {
   let { purchaser, purchasingDate, state, stateText, extra, goodsList } = ctx.request.body;
@@ -45,7 +45,7 @@ async function check (ctx) {
   let uniqueCode = ctx.request.body.uniqueCode;
   let data = await Purchase.findOne({ uniqueCode });
   data.goodsList.forEach(v => {
-    v.state = 1;
+    v.state = 0;
     v.stateText = '未签收';
   });
   await Purchase.update({ uniqueCode }, { state: 1, stateText: '未签收', goodsList: data.goodsList });
@@ -67,15 +67,14 @@ async function sign (ctx) {
     processor: '',
     extra: ''
   };
-
-  if (!id) {
+  if (id === undefined) {
     data.goodsList.forEach(v => {
       v.state = 2;
       v.stateText = '已签收';
     });
     await Purchase.update({ uniqueCode }, { state: 3, stateText: '全部签收', goodsList: data.goodsList });
     // 生成入库申请
-    let goodsList = data.goodsList.map(v => ({ id: v.id, goodsName: v.goodsName, amount: v.amount }));
+    let goodsList = data.goodsList.map(v => ({ id: v.id, uniqueCode: v.uniqueCode, goodsName: v.goodsName, amount: v.amount }));
     let newUniqueCode = +new Date();
     const newRequisition = new StockinRequisition({
       uniqueCode: newUniqueCode, goodsList, applicant: username, ...newRequisitionParams
@@ -85,7 +84,12 @@ async function sign (ctx) {
     let goods = data.goodsList.find((v) => { return v.id === +id; });
     goods.state = 1;
     goods.stateText = '已签收';
-    await Purchase.update({ uniqueCode }, { state: 2, stateText: '部分签收', goodsList: data.goodsList });
+
+    if (data.goodsList.every((v) => { return v.state === 1; })) {
+      await Purchase.update({ uniqueCode }, { state: 3, stateText: '全部签收', goodsList: data.goodsList });
+    } else {
+      await Purchase.update({ uniqueCode }, { state: 2, stateText: '部分签收', goodsList: data.goodsList });
+    }
 
     // 生成入库申请
     let newUniqueCode = +new Date();

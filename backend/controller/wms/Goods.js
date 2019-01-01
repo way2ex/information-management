@@ -21,10 +21,25 @@ async function createOne (ctx) {
 }
 
 /**
- * 
+ * 模糊查询获取商品列表
  */
+async function findManyWithFuzzy (ctx) {
+  let { keyword } = ctx.request.query;
+  let regex = new RegExp(keyword, 'i');
+  let result = await Goods.find({
+    $or: [
+      { goodsName: { $regex: regex } },
+      { uniqueCode: { $regex: regex } }
+    ]
+  });
+  ctx.body = {
+    result: 1,
+    data: result
+  };
+}
 
 module.exports = {
   findMany,
-  createOne
+  createOne,
+  findManyWithFuzzy
 };

@@ -26,6 +26,14 @@ import StockInReqLIST from '@/views/wms/stock-in/stock-in-req';
 
 import GoodsManagement from '@/views/wms/goods-management/index';
 
+import Transshipment from '@/views/wms/transshipment/index';
+import TransshipApplication from '@/views/wms/transshipment/application';
+import TransshipCheck from '@/views/wms/transshipment/check';
+import TransshipExecution from '@/views/wms/transshipment/execution';
+
+import Stocktaking from '@/views/wms/stocktaking/index';
+import StocktakingApplication from '@/views/wms/stocktaking/application';
+
 Vue.use(Router);
 const router = new Router({
   routes: [
@@ -76,6 +84,44 @@ const router = new Router({
               component: GoodsManagement,
               name: 'goods-management',
               meta: { name: '库存商品管理', activeMenuItem: '/main/wms/goods-management' }
+            }
+          ]
+        },
+        {
+          path: 'transship',
+          component: Transshipment,
+          meta: { name: '调拨管理' },
+          children: [
+            {
+              path: 'application',
+              component: TransshipApplication,
+              name: 'transship-application',
+              meta: { name: '调拨申请', activeMenuItem: '/main/transship/application' }
+            },
+            {
+              path: 'check',
+              component: TransshipCheck,
+              name: 'transship-check',
+              meta: { name: '调拨审核', activeMenuItem: '/main/transship/check' }
+            },
+            {
+              path: 'execution',
+              component: TransshipExecution,
+              name: 'transship-execution',
+              meta: { name: '调拨执行', activeMenuItem: '/main/transship/execution' }
+            }
+          ]
+        },
+        {
+          path: 'stocktaking',
+          component: Stocktaking,
+          meta: { name: '盘点管理' },
+          children: [
+            {
+              path: 'application',
+              component: StocktakingApplication,
+              name: 'stocktaking-application',
+              meta: { name: '盘点申请', activeMenuItem: '/main/stocktaking/application' }
             }
           ]
         },

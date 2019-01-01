@@ -25,19 +25,17 @@
   <el-table-column type="selection" width="30"></el-table-column>
   <el-table-column type="expand">
     <template slot-scope="props">
-      <el-table border size="mini" :data="props.row.position" v-if="+props.row.amount !== 0">
+      <el-table border size="mini" :data="props.row.positions" v-if="+props.row.amount !== 0">
         <el-table-column prop="amount" label="数量"></el-table-column>
         <el-table-column label="起始位置">
-          <el-table-column label="通道编号" prop="startLine"></el-table-column>
-          <el-table-column label="货架编号" prop="startShelf"></el-table-column>
-          <el-table-column label="列数" prop="startCol"></el-table-column>
-          <el-table-column label="层数" prop="startLayer"></el-table-column>
+          <template slot-scope="scope">
+            {{scope.row.startLine}}通道 {{scope.row.startShelf}}货架 {{scope.row.startCol}}列 {{scope.row.startLayer}}层
+          </template>
         </el-table-column>
         <el-table-column label="结束位置">
-          <el-table-column label="通道编号" prop="endLine"></el-table-column>
-          <el-table-column label="货架编号" prop="endShelf"></el-table-column>
-          <el-table-column label="列数" prop="endCol"></el-table-column>
-          <el-table-column label="层数" prop="endLayer"></el-table-column>
+          <template slot-scope="scope">
+            {{scope.row.endLine}}通道 {{scope.row.endShelf}}货架 {{scope.row.endCol}}列 {{scope.row.endLayer}}层
+          </template>
         </el-table-column>
       </el-table>
       <el-row v-else>暂无商品位置信息</el-row>

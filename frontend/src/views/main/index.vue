@@ -29,6 +29,46 @@ export default {
           ]
         },
         {
+          type: 'composite',
+          title: '调拨管理',
+          iconClass: 'fa-ticket',
+          index: '/main/transship',
+          children: [
+            {
+              title: '调拨申请',
+              index: '/main/transship/application'
+            },
+            {
+              title: '调拨审核',
+              index: '/main/transship/check'
+            },
+            {
+              title: '调拨执行',
+              index: '/main/transship/execution'
+            }
+          ]
+        },
+        {
+          type: 'composite',
+          title: '盘点管理',
+          iconClass: 'fa-ticket',
+          index: '/main/stocktaking',
+          children: [
+            {
+              title: '盘点申请',
+              index: '/main/stocktaking/application'
+            }
+            // {
+            //   title: '调拨审核',
+            //   index: '/main/transship/check'
+            // },
+            // {
+            //   title: '调拨执行',
+            //   index: '/main/transship/execution'
+            // }
+          ]
+        },
+        {
           type: 'single',
           title: '用户管理',
           index: '/main/um',

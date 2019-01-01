@@ -43,6 +43,7 @@
         <template slot-scope="props">
           <el-table :data="props.row.goodsList" border size="small">
             <el-table-column label="商品名称" prop="goodsName"></el-table-column>
+            <el-table-column label="商品编号" prop="uniqueCode"></el-table-column>
             <el-table-column label="单价(元)" prop="price"></el-table-column>
             <el-table-column label="数量" prop="amount"></el-table-column>
             <el-table-column label="总价(元)" prop="totalPrice"></el-table-column>
@@ -74,7 +75,7 @@
             审核
           </el-button>
           <el-button
-            :disabled="scope.row.state !== 1"
+            :disabled="scope.row.state === 3 || scope.row.state === 0"
             @click.native.prevent="sign(scope.row)"
             type="text"
             size="small">签收全部

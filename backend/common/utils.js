@@ -5,6 +5,9 @@ const findManyGenerator = (filterKeys, Model) => {
     for (let key of filterKeys) {
       query[key] && (condition[key] = query[key]);
     }
+    if ( typeof condition['state'] === 'string') {
+      condition['state'] = { $in: condition['state'].split(',') };
+    }
     let result = await Model.paginate(condition, { page: +query.currentPage, limit: +query.pageSize });
     ctx.body = {
       result: 1,
