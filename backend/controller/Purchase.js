@@ -45,7 +45,7 @@ async function check (ctx) {
   let uniqueCode = ctx.request.body.uniqueCode;
   let data = await Purchase.findOne({ uniqueCode });
   data.goodsList.forEach(v => {
-    v.state = 0;
+    v.state = 1;
     v.stateText = '未签收';
   });
   await Purchase.update({ uniqueCode }, { state: 1, stateText: '未签收', goodsList: data.goodsList });
@@ -67,6 +67,7 @@ async function sign (ctx) {
     processor: '',
     extra: ''
   };
+  // 对每个商品：  0：未审核 1：未签收 2: 已签收
   if (id === undefined) {
     data.goodsList.forEach(v => {
       v.state = 2;
@@ -82,10 +83,10 @@ async function sign (ctx) {
     await newRequisition.save();
   } else {
     let goods = data.goodsList.find((v) => { return v.id === +id; });
-    goods.state = 1;
+    goods.state = 2;
     goods.stateText = '已签收';
 
-    if (data.goodsList.every((v) => { return v.state === 1; })) {
+    if (data.goodsList.every((v) => { return v.state === 2; })) {
       await Purchase.update({ uniqueCode }, { state: 3, stateText: '全部签收', goodsList: data.goodsList });
     } else {
       await Purchase.update({ uniqueCode }, { state: 2, stateText: '部分签收', goodsList: data.goodsList });

@@ -144,7 +144,7 @@ export default {
       });
       this.getUsers();
     },
-    async updateRow(row) {
+    async updateRow (row) {
       this.$router.push({ name: 'um-update', params: { id: row.username } });
     }
   }

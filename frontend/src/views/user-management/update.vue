@@ -81,7 +81,7 @@ export default {
           { validator: validatePass, trigger: 'blur' }
         ],
         repassword: [
-           { validator: validatePass2, trigger: 'blur' }
+          { validator: validatePass2, trigger: 'blur' }
         ],
         department: [
           { required: true, message: '请输入部门名称', trigger: 'blur' }
@@ -128,7 +128,7 @@ export default {
       });
     }
   }
-}
+};
 </script>
 <style lang="less" scoped>
 .form {
@@ -139,4 +139,3 @@ export default {
   }
 }
 </style>
-

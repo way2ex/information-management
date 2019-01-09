@@ -25,6 +25,11 @@ export default {
               title: '库存商品管理',
               index: '/main/wms/goods-management',
               iconClass: 'fa-cubes'
+            },
+            {
+              title: '货位管理',
+              index: '/main/wms/locations',
+              iconClass: ''
             }
           ]
         },
@@ -73,20 +78,6 @@ export default {
           title: '用户管理',
           index: '/main/um',
           iconClass: 'fa-users'
-        }
-      ],
-      settingMenuItems: [
-        {
-          type: 'single',
-          title: '',
-          index: '3',
-          iconClass: 'fa-cog'
-        },
-        {
-          type: 'single',
-          title: '',
-          index: '4',
-          iconClass: 'fa-power-off'
         }
       ]
     };
@@ -138,13 +129,6 @@ export default {
               </el-menu-item>
             </template>
           </el-menu-item-group>
-
-          <el-menu-item-group class="setting-menu-group">
-            <el-menu-item v-for="item of settingMenuItems" :index="item.index" :key="item.index" :route="item.route">
-              <i class="fa" :class="item.iconClass"></i>
-              <span slot="title">{{ item.title }}</span>
-            </el-menu-item>
-          </el-menu-item-group>
         </el-menu>
       </aside>
     </el-aside>
@@ -178,7 +162,7 @@ export default {
   height: 100%;
 }
 .aside {
-  @settingMenuHeight: 150px;
+  @settingMenuHeight: 30px;
   @logoHeight: 50px;
 
   background-color: rgb(84, 92, 100);

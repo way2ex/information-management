@@ -354,10 +354,24 @@ export default {
     addDetail () {
       let id = this.createFormData.details.length;
       this.createFormData.details.push({
-        id: id, amount: 10, outStartLine: '3', outStartShelf: '3', outStartCol: '3', outStartLayer: '3',
-        outEndLine: '3', outEndShelf: '3', outEndCol: '3', outEndLayer: '3',
-        inStartLine: '3', inStartShelf: '3', inStartCol: '3', inStartLayer: '3',
-        inEndLine: '3', inEndShelf: '3', inEndCol: '3', inEndLayer: '3'
+        id: id,
+        amount: 10,
+        outStartLine: '3',
+        outStartShelf: '3',
+        outStartCol: '3',
+        outStartLayer: '3',
+        outEndLine: '3',
+        outEndShelf: '3',
+        outEndCol: '3',
+        outEndLayer: '3',
+        inStartLine: '3',
+        inStartShelf: '3',
+        inStartCol: '3',
+        inStartLayer: '3',
+        inEndLine: '3',
+        inEndShelf: '3',
+        inEndCol: '3',
+        inEndLayer: '3'
       });
     },
     deleteDetail (id) {

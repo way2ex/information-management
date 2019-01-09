@@ -30,9 +30,6 @@
           </el-form-item>
         </el-col>
       </el-row>
-      <el-row justify="start" type="flex">
-
-      </el-row>
     </el-form>
     <el-table
       :data="tableData" border
@@ -44,28 +41,22 @@
             <el-table-column label="商品编号" prop="uniqueCode"></el-table-column>
             <el-table-column label="数量" prop="amount"></el-table-column>
           </el-table>
-          <el-table v-else :data="props.row.goodsList" border size="small">
+          <el-table v-else :data="props.row.goodsList" border size="small" :default-expand-all="true">
+            <el-table-column type="expand">
+              <template slot-scope="{ row }">
+                <el-table :data="row.positions" size="mini">
+                  <el-table-column label="位置">
+                    <template slot-scope="{ row }">
+                      {{row.line}}通道 {{row.shelf}}货架 {{row.col}}列 {{row.layer}}层
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="数量" prop="amount"></el-table-column>
+                </el-table>
+              </template>
+            </el-table-column>
             <el-table-column label="商品名称" prop="goodsName"></el-table-column>
             <el-table-column label="商品编号" prop="uniqueCode"></el-table-column>
             <el-table-column label="数量" prop="amount"></el-table-column>
-            <el-table-column label="起始位置">
-              <template slot-scope="scope">
-                {{scope.row.startLine}}通道 {{scope.row.startShelf}}货架 {{scope.row.startCol}}列 {{scope.row.startLayer}}层
-              </template>
-              <!-- <el-table-column label="通道编号" prop="startLine"></el-table-column>
-              <el-table-column label="货架编号" prop="startShelf"></el-table-column>
-              <el-table-column label="列数" prop="startCol"></el-table-column>
-              <el-table-column label="层数" prop="startLayer"></el-table-column> -->
-            </el-table-column>
-            <el-table-column label="结束位置">
-              <template slot-scope="scope">
-                {{scope.row.endLine}}通道 {{scope.row.endShelf}}货架 {{scope.row.endCol}}列 {{scope.row.endLayer}}层
-              </template>
-              <!-- <el-table-column label="通道编号" prop="endLine"></el-table-column>
-              <el-table-column label="货架编号" prop="endShelf"></el-table-column>
-              <el-table-column label="列数" prop="endCol"></el-table-column>
-              <el-table-column label="层数" prop="endLayer"></el-table-column> -->
-            </el-table-column>
           </el-table>
         </template>
       </el-table-column>
@@ -92,27 +83,55 @@
       :current-page="1" :page-sizes="pageInformation.pageSizes"
       :page-size="pageInformation.pageSize" layout="total, sizes, prev, pager, next, jumper"
       :total="pageInformation.total"></el-pagination>
-    <el-dialog title="商品入库" :visible="isStockInDlgShow" center width="70%">
-      <el-form label-width="80px" size="mini" :model="stockInForm" ref="stockInForm">
-        <el-card v-for="(goods, index) in selectedRow.goodsList" :key="goods.id" class="stock-in-card">
+    <el-dialog title="商品入库" :visible="isStockInDlgShow" center width="60%">
+      <el-form label-width="60px" size="mini" :model="stockInForm" ref="stockInForm">
+        <el-card v-for="(goods, index) in stockInForm.goodsList" :key="goods.id" class="stock-in-card">
           <el-row slot="header">
             <el-col :span="8">商品名称: {{goods.goodsName}}</el-col>
             <el-col :span="8">商品数量: {{goods.amount}}</el-col>
           </el-row>
-          <el-col :span="3">起始位置：</el-col>
-          <el-col :span="21">
-            <el-col :span="6"><el-form-item label="通道编号" :rules="stockInRules" :prop="`goodsList.${index}.startLine`"><el-input v-model.number="stockInForm.goodsList[index].startLine" ></el-input></el-form-item></el-col>
-            <el-col :span="6"><el-form-item label="货架编号" :rules="stockInRules" :prop="`goodsList.${index}.startShelf`"><el-input v-model.number="stockInForm.goodsList[index].startShelf"></el-input></el-form-item></el-col>
-            <el-col :span="6"><el-form-item label="列数" :rules="stockInRules" :prop="`goodsList.${index}.startCol`"><el-input v-model.number="stockInForm.goodsList[index].startCol"></el-input></el-form-item></el-col>
-            <el-col :span="6"><el-form-item label="层数" :rules="stockInRules" :prop="`goodsList.${index}.startLayer`"><el-input v-model.number="stockInForm.goodsList[index].startLayer"></el-input></el-form-item></el-col>
-          </el-col>
-          <el-col :span="3">结束位置：</el-col>
-          <el-col :span="21">
-            <el-col :span="6"><el-form-item label="通道编号" :rules="stockInRules" :prop="`goodsList.${index}.endLine`"><el-input v-model.number="stockInForm.goodsList[index].endLine"></el-input></el-form-item></el-col>
-            <el-col :span="6"><el-form-item label="货架编号" :rules="stockInRules" :prop="`goodsList.${index}.endShelf`"><el-input v-model.number="stockInForm.goodsList[index].endShelf"></el-input></el-form-item></el-col>
-            <el-col :span="6"><el-form-item label="列数" :rules="stockInRules" :prop="`goodsList.${index}.endCol`"><el-input v-model.number="stockInForm.goodsList[index].endCol"></el-input></el-form-item></el-col>
-            <el-col :span="6"><el-form-item label="层数" :rules="stockInRules" :prop="`goodsList.${index}.endLayer`"><el-input v-model.number="stockInForm.goodsList[index].endLayer"></el-input></el-form-item></el-col>
-          </el-col>
+          <el-row type="flex" justify="start" class="mb15"
+            v-for="(position, positionIndex) in stockInForm.goodsList[index].positions" :key="position.id">
+            <el-col :span="4">
+              <el-form-item label="通道" :rules="stockInRules" :prop="`goodsList.${index}.positions.${positionIndex}.line`">
+                <el-select v-model="stockInForm.goodsList[index].positions[positionIndex].line">
+                  <el-option v-for="line in lines" :key="line" :label="line" :value="line"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="4">
+              <el-form-item label="货架" :rules="stockInRules" :prop="`goodsList.${index}.positions.${positionIndex}.shelf`">
+                <el-select v-model="stockInForm.goodsList[index].positions[positionIndex].shelf">
+                  <el-option v-for="shelf in shelves" :key="shelf" :label="shelf" :value="shelf"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="4">
+              <el-form-item label="列" :rules="stockInRules" :prop="`goodsList.${index}.positions.${positionIndex}.col`">
+                <el-select v-model="stockInForm.goodsList[index].positions[positionIndex].col">
+                  <el-option v-for="col in cols" :key="col" :label="col" :value="col"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="4">
+              <el-form-item label="层" :rules="stockInRules" :prop="`goodsList.${index}.positions.${positionIndex}.layer`">
+                <el-select v-model="stockInForm.goodsList[index].positions[positionIndex].layer">
+                  <el-option v-for="layer in layers" :key="layer" :label="layer" :value="layer"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="4">
+              <el-form-item label="数量" :rules="stockInAmountRules" :prop="`goodsList.${index}.positions.${positionIndex}.amount`">
+                <el-input v-model.number="stockInForm.goodsList[index].positions[positionIndex].amount"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="2" :offset="2">
+              <el-button @click="deletePosition(index, positionIndex)" type="danger" size="mini">删除</el-button>
+            </el-col>
+          </el-row>
+          <el-row type="flex" justify="start">
+            <el-button type="primary" size="mini" @click="addPosition(index)">添加位置</el-button>
+          </el-row>
         </el-card>
       </el-form>
       <el-row slot="footer">
@@ -126,9 +145,27 @@
 <script>
 export default {
   data () {
+    let stockInAmountRules = (rule, value, cb) => {
+      if (value === 0) {
+        cb(new Error('数量不可为0'));
+        return;
+      }
+      this.stockInForm.goodsList.forEach((goods) => {
+        let total = goods.positions.reduce((acc, cur) => { return acc + +cur.amount; }, 0);
+        if (total !== +goods.amount) {
+          cb(new Error('请认真核对各位置数量'));
+        } else {
+          cb();
+        }
+      });
+    };
     return {
       username: [],
       tableData: [],
+      lines: [],
+      shelves: ['A', 'B'],
+      cols: ['1', '2', '3', '4', '5'],
+      layers: ['1', '2', '3', '4'],
       queryForm: {
         nickname: '',
         username: '',
@@ -150,13 +187,16 @@ export default {
         goodsList: []
       },
       stockInRules: [
-        { required: true, message: '请输入位置信息', trigger: 'blur' },
-        { type: 'number', message: '位置信息需要为数值', trigger: 'blur' }
+        { required: true, message: '请输入位置信息', trigger: 'blur' }
+      ],
+      stockInAmountRules: [
+        { validator: stockInAmountRules, trigger: 'blur' }
       ]
     };
   },
   created () {
     this.getData();
+    this.getLines();
     this.username = sessionStorage.getItem('username');
   },
   methods: {
@@ -173,6 +213,10 @@ export default {
           this.pageInformation = { ...this.pageInformation, total: data.total };
         });
     },
+    async getLines () {
+      let response = await ajax.get('/wms/lines');
+      this.lines = response.data;
+    },
     handleSizeChange (size) {
       this.pageInformation = { ...this.pageInformation, pageSize: size };
       this.getData();
@@ -183,13 +227,10 @@ export default {
     },
     async stockIn (row) {
       this.selectedRow = row;
-      let length = row.goodsList.length;
-      this.stockInForm.goodsList = [];
-      for (let i = 0; i < length; i++) {
-        this.stockInForm.goodsList.push({
-          ...row.goodsList[i], startLine: 1, startShelf: 1, startCol: 1, startLayer: 1, endLine: 1, endShelf: 1, endCol: 1, endLayer: 1
-        });
-      }
+      this.stockInForm.goodsList = row.goodsList.map((v) => ({
+        ...v,
+        positions: [{ id: 0, line: '1', shelf: 'A', col: '1', layer: '1', amount: 0 }]
+      }));
       this.isStockInDlgShow = true;
     },
     cancelStockIn () {
@@ -198,6 +239,11 @@ export default {
     confirmStockIn () {
       this.$refs['stockInForm'].validate(async (valid) => {
         if (valid) {
+          this.stockInForm.goodsList.forEach((goods) => {
+            goods.positions.forEach((position) => {
+              position.uniqueCode = position.line + position.shelf + position.col + position.layer;
+            });
+          });
           let data = { ...this.selectedRow, goodsList: this.stockInForm.goodsList, username: this.username };
           await ajax.post('/wms/stock-in', data);
           this.$message({
@@ -208,6 +254,18 @@ export default {
           this.isStockInDlgShow = false;
           this.getData();
         }
+      });
+    },
+    deletePosition (index, subIndex) {
+      this.stockInForm.goodsList[index].positions.splice(subIndex, 1);
+    },
+    addPosition (index) {
+      let positions = this.stockInForm.goodsList[index].positions;
+      let obj = positions[positions.length - 1];
+      positions.push({
+        ...obj,
+        id: obj.id + 1,
+        amount: 0
       });
     }
   }
@@ -220,6 +278,6 @@ export default {
 </style>
 <style lang="less">
 .stock-in-card .el-form-item__content {
-  width: calc(100% - 80px);
+  width: calc(100% - 60px);
 }
 </style>

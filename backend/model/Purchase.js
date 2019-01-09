@@ -13,7 +13,7 @@ const PurchaseScheme = new mongoose.Schema({
   // provider: String,
   purchaser: String,
   purchasingDate: String,
-  state: Number,
+  state: Number, // -1：已回绝 0: 未审核 1：未签收 2：部分签收 3: 全部签收
   stateText: String,
   extra: String,
   goodsList: Array

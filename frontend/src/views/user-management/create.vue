@@ -114,7 +114,7 @@ export default {
       });
     }
   }
-}
+};
 </script>
 <style lang="less" scoped>
 .form {
@@ -125,4 +125,3 @@ export default {
   }
 }
 </style>
-

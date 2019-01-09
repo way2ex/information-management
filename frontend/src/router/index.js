@@ -25,6 +25,7 @@ import StockIn from '@/views/wms/stock-in';
 import StockInReqLIST from '@/views/wms/stock-in/stock-in-req';
 
 import GoodsManagement from '@/views/wms/goods-management/index';
+import LocationsManagement from '@/views/wms/locations/index';
 
 import Transshipment from '@/views/wms/transshipment/index';
 import TransshipApplication from '@/views/wms/transshipment/application';
@@ -84,6 +85,12 @@ const router = new Router({
               component: GoodsManagement,
               name: 'goods-management',
               meta: { name: '库存商品管理', activeMenuItem: '/main/wms/goods-management' }
+            },
+            {
+              path: 'locations',
+              component: LocationsManagement,
+              name: 'locations',
+              meta: { name: '货位管理', activeMenuItem: '/main/wms/locations' }
             }
           ]
         },

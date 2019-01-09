@@ -26,17 +26,12 @@
   <el-table-column type="expand">
     <template slot-scope="props">
       <el-table border size="mini" :data="props.row.positions" v-if="+props.row.amount !== 0">
+        <el-table-column label="位置">
+          <template slot-scope="scope">
+            {{scope.row.line}}通道 {{scope.row.shelf}}货架 {{scope.row.col}}列 {{scope.row.layer}}层
+          </template>
+        </el-table-column>
         <el-table-column prop="amount" label="数量"></el-table-column>
-        <el-table-column label="起始位置">
-          <template slot-scope="scope">
-            {{scope.row.startLine}}通道 {{scope.row.startShelf}}货架 {{scope.row.startCol}}列 {{scope.row.startLayer}}层
-          </template>
-        </el-table-column>
-        <el-table-column label="结束位置">
-          <template slot-scope="scope">
-            {{scope.row.endLine}}通道 {{scope.row.endShelf}}货架 {{scope.row.endCol}}列 {{scope.row.endLayer}}层
-          </template>
-        </el-table-column>
       </el-table>
       <el-row v-else>暂无商品位置信息</el-row>
     </template>

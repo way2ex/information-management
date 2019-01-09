@@ -4,6 +4,7 @@ const StockInReqCtrl = require('../../controller/wms/StockinRequisition');
 const GoodsCtrl = require('../../controller/wms/Goods');
 const TranshipCtrl = require('../../controller/wms/Transship');
 const Stocktaking = require('../../controller/wms/Stocktaking');
+const Locations = require('../../controller/wms/Locations');
 
 router.get('/stock-in-req', StockInReqCtrl.findMany);
 router.post('/stock-in', StockInReqCtrl.stockIn);
@@ -20,5 +21,9 @@ router.post('/finish-transship', TranshipCtrl.finish);
 
 router.get('/stocktaking', Stocktaking.findMany);
 router.post('/apply-stocktaking', Stocktaking.createOne);
+
+router.get('/locations', Locations.findMany);
+router.get('/lines', Locations.getLines);
+router.post('/create-line', Locations.createLine);
 
 module.exports = router;
