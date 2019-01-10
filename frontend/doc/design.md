@@ -11,3 +11,21 @@
 - 1： 未签收，审核通过但还没有签收
 - 2： 部分签收， 订单的商品中部分被签收
 - 3： 全部签收
+
+# 调拨
+每个调拨单只能调拨一种商品。
+调拨单中含有 `details` 字段，包含如下：
+```json
+  "details" : [{
+      "id" : 0,
+      "amount" : 5,
+      "outLine" : "1",
+      "outShelf" : "A",
+      "outCol" : "1",
+      "outLayer" : "1",
+      "inLine" : "1",
+      "inShelf" : "A",
+      "inCol" : "2",
+      "inLayer" : "1"
+  }]
+```

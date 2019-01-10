@@ -22,7 +22,7 @@ async function stockIn (ctx) {
   });
   let goodsFromDB = await Promise.all(queryGoodsProArr);
   for (let i = 0; i < goodsList.length; i++) {
-    goodsFromDB[i].amount += goodsList[i].amount;
+    goodsFromDB[i].amount += +goodsList[i].amount;
     goodsList[i].positions.forEach((position) => {
       let indexOfPos = goodsFromDB[i].positions.findIndex((v) => { return v.uniqueCode === position.uniqueCode; });
       if (indexOfPos === -1) {
@@ -32,7 +32,7 @@ async function stockIn (ctx) {
           shelf: position.shelf,
           col: position.col,
           layer: position.layer,
-          amount: position.amount
+          amount: +position.amount
         });
       } else {
         goodsFromDB[i].positions[indexOfPos].amount += +position.amount;
@@ -52,7 +52,7 @@ async function stockIn (ctx) {
   }
   let updateGoodsProArr = goodsFromDB.map((item) => {
     return Goods.update({ uniqueCode: item.uniqueCode }, {
-      positions: item.positions, amount: item.amount
+      positions: item.positions, amount: +item.amount
     });
   });
   await Promise.all(updateGoodsProArr);
@@ -65,7 +65,7 @@ async function stockIn (ctx) {
       if (positionFromDB.state === 0) {
         obj.state = 1;
         obj.stateText = '使用中';
-        obj.amount = position.amount;
+        obj.amount = +position.amount;
         obj.goodsName = goods.goodsName;
         obj.goodsUniqueCode = goods.uniqueCode;
       } else {

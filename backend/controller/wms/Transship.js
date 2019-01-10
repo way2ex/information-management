@@ -1,4 +1,6 @@
 const Transship = require('../../model/wms/Transship');
+const Goods = require('../../model/wms/Goods');
+const Locations = require('../../model/wms/Locations');
 const { findManyGenerator } = require('../../common/utils');
 const dateTime = require('date-time');
 
@@ -76,6 +78,46 @@ async function finish (ctx) {
     };
     return;
   }
+  // 更新商品信息
+  let { goodsUniqueCode, goodsName, details } = result;
+  let targetGoods = await Goods.findOne({ uniqueCode: goodsUniqueCode });
+  details.forEach(async (detail) => {
+    let { amount, outLine, outShelf, outCol, outLayer, inLine, inShelf, inCol, inLayer } = detail;
+    let outPosCode = outLine + outShelf + outCol + outLayer;
+    let outPosIndex = targetGoods.positions.findIndex(v => v.uniqueCode === outPosCode);
+    // 调出货位一定存在， 这里可以对调出数量进行校验和限制
+    targetGoods.positions[outPosIndex].amount -= amount;
+    if (targetGoods.positions[outPosIndex].amount === 0) {
+      targetGoods.positions.splice(outPosIndex, 1);
+    }
+
+    let inPosCode = inLine + inShelf + inCol + inLayer;
+    let inPosIndex = targetGoods.positions.findIndex(v => v.uniqueCode === inPosCode);
+    if (inPosIndex === -1) {
+      // 新位置
+      targetGoods.positions.push({
+        uniqueCode: inPosCode, line: inLine, shelf: inShelf, col: inCol, layer: inLayer, amount
+      });
+    } else {
+      targetGoods.positions[inPosIndex].amount += amount;
+    }
+
+    // 更新位置信息
+    let position = await Locations.findOne({ uniqueCode: outPosCode });
+    // 这里可以对调出数量进行校验和限制
+    position.amount -= amount;
+    await Locations.update({ uniqueCode: outPosCode }, { amount: position.amount });
+    position = await Locations.findOne({ uniqueCode: inPosCode });
+    if (position.state === 0) {
+      await Locations.update({ uniqueCode: inPosCode }, {
+        amount, goodsUniqueCode, goodsName,
+        state: 1, stateText: '使用中'
+      });
+    } else {
+      await Locations.update({ uniqueCode: inPosCode }, { amount: position.amount + amount });
+    }
+  });
+  await Goods.update({ uniqueCode: goodsUniqueCode }, { positions: targetGoods.positions });
   await Transship.update({ uniqueCode }, {
     state: 3,
     stateText: '已完成',

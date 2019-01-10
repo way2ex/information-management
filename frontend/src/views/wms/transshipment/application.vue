@@ -53,16 +53,12 @@
           <el-table-column prop="amount" label="调拨数量" width="80"></el-table-column>
           <el-table-column label="调出货位">
             <template slot-scope="scope">
-              {{scope.row.inStartLine}}通道 {{scope.row.inStartShelf}}货架 {{scope.row.inStartCol}}列 {{scope.row.inStartLayer}}层
-              <span class="divider">至</span>
-              {{scope.row.inEndLine}}通道 {{scope.row.inEndShelf}}货架 {{scope.row.inEndCol}}列 {{scope.row.inEndLayer}}层
+              {{scope.row.outLine}}通道 {{scope.row.outShelf}}货架 {{scope.row.outCol}}列 {{scope.row.outLayer}}层
             </template>
           </el-table-column>
           <el-table-column label="调入货位">
             <template slot-scope="scope">
-              {{scope.row.inStartLine}}通道 {{scope.row.inStartShelf}}货架 {{scope.row.inStartCol}}列 {{scope.row.inStartLayer}}层
-              <span class="divider">至</span>
-              {{scope.row.inEndLine}}通道 {{scope.row.inEndShelf}}货架 {{scope.row.inEndCol}}列 {{scope.row.inEndLayer}}层
+              {{scope.row.inLine}}通道 {{scope.row.inShelf}}货架 {{scope.row.inCol}}列 {{scope.row.inLayer}}层
             </template>
           </el-table-column>
         </el-table>
@@ -123,20 +119,17 @@
           </el-form-item>
         </el-col>
       </el-row>
-      <div class="section-header mv10">调拨详情
-        <el-button type="primary" size="mini" style="margin-left: 30px;" @click="addDetail">增加调拨信息</el-button>
-      </div>
       <el-card v-for="(detail) in createFormData.details"
         :key="detail.id" class="transship-create-card">
         <el-row type="flex" justify="start">
           <el-col :span="6">
             <el-form-item label="调拨数量" label-width="100px">
-              <el-input v-model="detail.amount"></el-input>
+              <el-input v-model.number="detail.amount"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="备注" label-width="100px">
-              <el-input type="textarea" v-model="detail.extra" :rows="2"></el-input>
+              <el-input type="textarea" v-model="detail.extra" :rows="1"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="4" :offset="2">
@@ -145,126 +138,71 @@
           </el-col>
         </el-row>
         <el-row type="flex" justify="start">
-          <el-col :span="8">
-            <el-form-item label="调出货位:" label-width="100px">
-              <el-input v-model="detail.outStartLine">
-                <template slot="append">通道</template>
-              </el-input>
+          <el-col :span="2">调出货位:</el-col>
+          <el-col :span="5">
+            <el-form-item label="通道" label-width="70px">
+              <el-select v-model="detail.outLine">
+                <el-option v-for="line in lines" :key="line" :label="line" :value="line"></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="5">
-            <el-form-item label="" label-width="0">
-              <el-input v-model="detail.outStartShelf">
-                <template slot="append">货架</template>
-              </el-input>
+            <el-form-item label="货架" label-width="50px">
+              <el-select v-model="detail.outShelf">
+                <el-option v-for="shelf in shelves" :key="shelf" :label="shelf" :value="shelf"></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="5">
-            <el-form-item label="" label-width="0">
-              <el-input v-model="detail.outStartCol">
-                <template slot="append">列</template>
-              </el-input>
+            <el-form-item label="列" label-width="50px">
+              <el-select v-model="detail.outCol">
+                <el-option v-for="col in cols" :key="col" :label="col" :value="col"></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="5">
-            <el-form-item label="" label-width="0">
-              <el-input v-model="detail.outStartLayer">
-                <template slot="append">层</template>
-              </el-input>
+            <el-form-item label="层" label-width="50px">
+              <el-select v-model="detail.outLayer">
+                <el-option v-for="layer in layers" :key="layer" :label="layer" :value="layer"></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row type="flex" justify="start">
-          <el-col :span="8">
-            <el-form-item label="至" label-width="100px">
-              <el-input v-model="detail.outEndLine">
-                <template slot="append">通道</template>
-              </el-input>
+          <el-col :span="2">调入货位:</el-col>
+          <el-col :span="5">
+            <el-form-item label="通道" label-width="70px">
+              <el-select v-model="detail.inLine">
+                <el-option v-for="line in lines" :key="line" :label="line" :value="line"></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="5">
-            <el-form-item label="" label-width="0">
-              <el-input v-model="detail.outEndShelf">
-                <template slot="append">货架</template>
-              </el-input>
+            <el-form-item label="货架" label-width="50px">
+              <el-select v-model="detail.inShelf">
+                <el-option v-for="shelf in shelves" :key="shelf" :label="shelf" :value="shelf"></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="5">
-            <el-form-item label="" label-width="0">
-              <el-input v-model="detail.outEndCol">
-                <template slot="append">列</template>
-              </el-input>
+            <el-form-item label="列" label-width="50px">
+              <el-select v-model="detail.inCol">
+                <el-option v-for="col in cols" :key="col" :label="col" :value="col"></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="5">
-            <el-form-item label="" label-width="0">
-              <el-input v-model="detail.outEndLayer">
-                <template slot="append">层</template>
-              </el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row type="flex" justify="start">
-          <el-col :span="8">
-            <el-form-item label="调入货位:">
-              <el-input v-model="detail.inStartLine">
-                <template slot="append">通道</template>
-              </el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="5">
-            <el-form-item label="" label-width="0">
-              <el-input v-model="detail.inStartShelf">
-                <template slot="append">货架</template>
-              </el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="5">
-            <el-form-item label="" label-width="0">
-              <el-input v-model="detail.inStartCol">
-                <template slot="append">列</template>
-              </el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="5">
-            <el-form-item label="" label-width="0">
-              <el-input v-model="detail.inStartLayer">
-                <template slot="append">层</template>
-              </el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row type="flex" justify="start">
-          <el-col :span="8">
-            <el-form-item label="至">
-              <el-input v-model="detail.inEndLine">
-                <template slot="append">通道</template>
-              </el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="5">
-            <el-form-item label="" label-width="0">
-              <el-input v-model="detail.inEndShelf">
-                <template slot="append">货架</template>
-              </el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="5">
-            <el-form-item label="" label-width="0">
-              <el-input v-model="detail.inEndCol">
-                <template slot="append">列</template>
-              </el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="5">
-            <el-form-item label="" label-width="0">
-              <el-input v-model="detail.inEndLayer">
-                <template slot="append">层</template>
-              </el-input>
+            <el-form-item label="层" label-width="50px">
+              <el-select v-model="detail.inLayer">
+                <el-option v-for="layer in layers" :key="layer" :label="layer" :value="layer"></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
       </el-card>
+      <div class="section-header mv10">
+        <el-button type="primary" size="mini" style="margin-left: 30px;" @click="addDetail">增加调拨信息</el-button>
+      </div>
     </el-form>
     <el-row slot="footer">
       <el-button size="media" @click="cancelAddGoods">取消</el-button>
@@ -305,16 +243,24 @@ export default {
         goodsName: '',
         amount: 0,
         extra: '',
-        details: []
+        details: [{
+          id: 0, amount: 0, outLine: '1', outShelf: 'A', outCol: '1', outLayer: '1',
+          inLine: '1', inShelf: 'A', inCol: '1', inLayer: '1'
+        }]
       },
       rules: {
         goodsName: [{ required: true, message: '请输入商品名称', trigger: 'blur' }],
         goodsUniqueCode: [{ required: true, message: '请输入商品编号', trigger: 'blur' }]
-      }
+      },
+      lines: [],
+      shelves: ['A', 'B'],
+      cols: ['1', '2', '3', '4', '5'],
+      layers: ['1', '2', '3', '4'],
     };
   },
   created () {
     this.getData();
+    this.getLines();
   },
   methods: {
     handleSizeChange (size) {
@@ -338,6 +284,10 @@ export default {
           this.pageInformation = { ...this.pageInformation, total: data.total };
         });
     },
+    async getLines () {
+      let response = await ajax.get('/wms/lines');
+      this.lines = response;
+    },
     async fetchSuggestions (queryString, cb) {
       let params = { keyword: queryString };
       let result = await ajax.get('/wms/mini-goods-list', {
@@ -352,26 +302,11 @@ export default {
       this.$refs['form'].validate();
     },
     addDetail () {
-      let id = this.createFormData.details.length;
+      let details = this.createFormData.details;
+      let id = details[details.length - 1].id + 1;
       this.createFormData.details.push({
-        id: id,
-        amount: 10,
-        outStartLine: '3',
-        outStartShelf: '3',
-        outStartCol: '3',
-        outStartLayer: '3',
-        outEndLine: '3',
-        outEndShelf: '3',
-        outEndCol: '3',
-        outEndLayer: '3',
-        inStartLine: '3',
-        inStartShelf: '3',
-        inStartCol: '3',
-        inStartLayer: '3',
-        inEndLine: '3',
-        inEndShelf: '3',
-        inEndCol: '3',
-        inEndLayer: '3'
+        ...details[details.length - 1],
+        id, amount: 0
       });
     },
     deleteDetail (id) {
@@ -443,9 +378,6 @@ export default {
   }
   .table .divider{
     margin: 0 15px;
-  }
-  .form .el-input {
-    width: 85%;
   }
   .goods-name-popper {
     li {

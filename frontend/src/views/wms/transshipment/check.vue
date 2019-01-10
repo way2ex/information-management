@@ -1,5 +1,5 @@
 <template>
-<div class="transship-application">
+<div class="transship-check">
   <el-form inline :model="queryForm" class="query-form" size="small" label-width="70px">
     <el-row justify="start" type="flex">
       <el-col :span="6">
@@ -49,16 +49,12 @@
           <el-table-column prop="amount" label="调拨数量" width="80"></el-table-column>
           <el-table-column label="调出货位">
             <template slot-scope="scope">
-              {{scope.row.inStartLine}}通道 {{scope.row.inStartShelf}}货架 {{scope.row.inStartCol}}列 {{scope.row.inStartLayer}}层
-              <span class="divider">至</span>
-              {{scope.row.inEndLine}}通道 {{scope.row.inEndShelf}}货架 {{scope.row.inEndCol}}列 {{scope.row.inEndLayer}}层
+              {{scope.row.outLine}}通道 {{scope.row.outShelf}}货架 {{scope.row.outCol}}列 {{scope.row.outLayer}}层
             </template>
           </el-table-column>
           <el-table-column label="调入货位">
             <template slot-scope="scope">
-              {{scope.row.inStartLine}}通道 {{scope.row.inStartShelf}}货架 {{scope.row.inStartCol}}列 {{scope.row.inStartLayer}}层
-              <span class="divider">至</span>
-              {{scope.row.inEndLine}}通道 {{scope.row.inEndShelf}}货架 {{scope.row.inEndCol}}列 {{scope.row.inEndLayer}}层
+              {{scope.row.inLine}}通道 {{scope.row.inShelf}}货架 {{scope.row.inCol}}列 {{scope.row.inLayer}}层
             </template>
           </el-table-column>
         </el-table>

@@ -215,7 +215,7 @@ export default {
     },
     async getLines () {
       let response = await ajax.get('/wms/lines');
-      this.lines = response.data;
+      this.lines = response;
     },
     handleSizeChange (size) {
       this.pageInformation = { ...this.pageInformation, pageSize: size };
