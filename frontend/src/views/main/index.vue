@@ -22,6 +22,10 @@ export default {
               iconClass: 'fa-home'
             },
             {
+              title: '盘点管理',
+              index: '/main/wms/stocktaking'
+            },
+            {
               title: '库存商品管理',
               index: '/main/wms/goods-management',
               iconClass: 'fa-cubes'
@@ -53,26 +57,22 @@ export default {
             }
           ]
         },
-        {
-          type: 'composite',
-          title: '盘点管理',
-          iconClass: 'fa-ticket',
-          index: '/main/stocktaking',
-          children: [
-            {
-              title: '盘点申请',
-              index: '/main/stocktaking/application'
-            }
-            // {
-            //   title: '调拨审核',
-            //   index: '/main/transship/check'
-            // },
-            // {
-            //   title: '调拨执行',
-            //   index: '/main/transship/execution'
-            // }
-          ]
-        },
+        // {
+        //   type: 'composite',
+        //   title: '盘点管理',
+        //   iconClass: 'fa-ticket',
+        //   index: '/main/stocktaking',
+        //   children: [
+        //     {
+        //       title: '盘点开单',
+        //       index: '/main/stocktaking/application'
+        //     },
+        //     {
+        //       title: '盘点执行',
+        //       index: '/main/transship/execution'
+        //     }
+        //   ]
+        // },
         {
           type: 'single',
           title: '用户管理',

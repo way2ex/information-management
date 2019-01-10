@@ -21,6 +21,8 @@ router.post('/finish-transship', TranshipCtrl.finish);
 
 router.get('/stocktaking', Stocktaking.findMany);
 router.post('/apply-stocktaking', Stocktaking.createOne);
+router.post('/start-stocktaking', Stocktaking.start);
+router.post('/enter-result', Stocktaking.enterResult);
 
 router.get('/locations', Locations.findMany);
 router.get('/lines', Locations.getLines);

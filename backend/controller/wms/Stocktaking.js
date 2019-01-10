@@ -6,12 +6,11 @@ const dateTime = require('date-time');
  * 按条件查找
  */
 const findMany = findManyGenerator(
-  ['uniqueCode', 'applicant',
-    'processor', 'state', 'executor'],
+  ['uniqueCode', 'applicant', 'state', 'executor'],
   Stocktaking);
 
 /**
- * 新建调拨申请
+ * 新建盘点申请
  */
 async function createOne (ctx) {
   let uniqueCode = +new Date();
@@ -19,7 +18,7 @@ async function createOne (ctx) {
   let applicatingDate = dateTime();
   let newStocktaking = new Stocktaking({
     uniqueCode, applicatingDate, goodsList,
-    applicant: username, processor: '', state: 0, stateText: '待审核', extra
+    applicant: username, executor: '', executingDate: '', state: 0, stateText: '待处理', extra
   });
   await newStocktaking.save();
   ctx.body = {
@@ -27,34 +26,15 @@ async function createOne (ctx) {
     msg: '新建成功'
   };
 }
-/**
- * 审核
- */
-async function check (ctx) {
-  let { uniqueCode, extra, username, isApproved } = ctx.request.body;
-  let checkDate = dateTime();
-
-  await Stocktaking.update({ uniqueCode }, {
-    state: isApproved ? 1 : -1,
-    stateText: isApproved ? '已通过待处理' : '审核未通过',
-    processor: username,
-    checkExtra: extra,
-    checkDate
-  });
-  ctx.body = {
-    result: 1,
-    msg: '审核成功'
-  };
-}
 
 /**
- * 执行
+ * 开始盘点
  */
-async function execute (ctx) {
+async function start (ctx) {
   let { uniqueCode, username } = ctx.request.body;
   await Stocktaking.update({ uniqueCode }, {
-    state: 2,
-    stateText: '正在处理',
+    state: 1,
+    stateText: '正在盘点',
     executor: username,
     executingDate: dateTime()
   });
@@ -64,10 +44,10 @@ async function execute (ctx) {
   };
 }
 /**
- * 执行完成
+ * 录入结果
  */
-async function finish (ctx) {
-  let { uniqueCode, username } = ctx.request.body;
+async function enterResult (ctx) {
+  let { uniqueCode, username, goodsList } = ctx.request.body;
   let result = await Stocktaking.findOne({ uniqueCode });
   if (username !== result.executor) {
     ctx.body = {
@@ -77,10 +57,11 @@ async function finish (ctx) {
     return;
   }
   await Stocktaking.update({ uniqueCode }, {
-    state: 3,
-    stateText: '已完成',
+    state: 2,
+    stateText: '已录入结果',
     executor: username,
-    executingDate: dateTime()
+    executingDate: dateTime(),
+    goodsList
   });
   ctx.body = {
     result: 1,
@@ -91,7 +72,6 @@ async function finish (ctx) {
 module.exports = {
   findMany,
   createOne,
-  check,
-  execute,
-  finish
+  start,
+  enterResult
 };

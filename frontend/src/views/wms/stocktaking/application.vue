@@ -1,7 +1,7 @@
 <template>
 <div class="stocktaking-application">
   <el-row justify="start" type="flex" class="mv10">
-    <el-button @click="create" type="primary">申请盘点</el-button>
+    <el-button @click="create" type="primary">盘点开单</el-button>
   </el-row>
   <el-form inline :model="queryForm" class="query-form" size="small" label-width="70px">
     <el-row justify="start" type="flex">
@@ -14,11 +14,10 @@
         <el-form-item label="当前状态" label-position="right">
           <el-select v-model="queryForm.state" width="188px">
             <el-option label="所有" value=""></el-option>
-            <el-option label="未通过" :value="-1"></el-option>
-            <el-option label="未审核" :value="0"></el-option>
-            <el-option label="已通过待处理" :value="1"></el-option>
-            <el-option label="正在处理" :value="2"></el-option>
-            <el-option label="已完成" :value="3"></el-option>
+            <el-option label="待处理" :value="0"></el-option>
+            <el-option label="正在处理" :value="1"></el-option>
+            <el-option label="已录入结果" :value="2"></el-option>
+            <el-option label="已生成出入库单" :value="3"></el-option>
           </el-select>
         </el-form-item>
       </el-col>
@@ -34,31 +33,47 @@
   <el-table :data="tableData" border size="medium" class="table" style="margin-top: 20px;">
     <el-table-column type="selection" width="30"></el-table-column>
     <el-table-column type="expand">
-      <template slot-scope="props">
-        <el-table border size="mini" :data="props.row.goodsList">
+      <template slot-scope="{ row }">
+        <el-table border size="mini" :data="row.goodsList" v-if="row.state === 0 || row.state === 1">
           <el-table-column prop="uniqueCode" label="商品编号"></el-table-column>
           <el-table-column prop="goodsName" label="商品名称"></el-table-column>
-          <el-table-column prop="amount" label="数量"></el-table-column>
+          <el-table-column prop="amount" label="库存数量"></el-table-column>
+        </el-table>
+        <el-table border size="mini" :data="row.goodsList" v-else>
+          <el-table-column prop="uniqueCode" label="商品编号"></el-table-column>
+          <el-table-column prop="goodsName" label="商品名称"></el-table-column>
+          <el-table-column prop="amount" label="库存数量"></el-table-column>
+          <el-table-column prop="actualAmount" label="盘点量"></el-table-column>
+          <el-table-column prop="gap" label="盈亏量"></el-table-column>
         </el-table>
       </template>
     </el-table-column>
-    <el-table-column prop="uniqueCode" label="盘点单号"></el-table-column>
-    <el-table-column label="申请日期" width="100px">
+    <el-table-column prop="uniqueCode" label="盘点单号" width="150px"></el-table-column>
+    <el-table-column prop="applicant" label="开单人" width="100px"></el-table-column>
+    <el-table-column label="开单时间" width="110px">
       <template slot-scope="scope">
         {{scope.row.applicatingDate.split(' ')[0]}} <br/>
         {{scope.row.applicatingDate.split(' ')[1]}}
       </template>
     </el-table-column>
-    <el-table-column label="当前状态">
-      <template slot-scope="scope">
-        {{scope.row.stateText}} <br/>
-        <div v-if="scope.row.state === -1">{{scope.row.checkExtra}}</div>
+    <el-table-column label="当前状态" prop="stateText" width="100px"></el-table-column>
+    <el-table-column label="盘点员" prop="executor" width="100px"></el-table-column>
+    <el-table-column label="盘点时间" width="110px">
+      <template slot-scope="{ row }">
+        <div v-if="row.executingDate">
+          {{row.executingDate.split(' ')[0]}} <br/>{{row.executingDate.split(' ')[1]}}
+        </div>
+        <div v-else></div>
       </template>
     </el-table-column>
-    <el-table-column prop="processor" label="审核管理员"></el-table-column>
     <el-table-column prop="extra" label="备注"></el-table-column>
-    <!-- <el-table-column label="操作" width="90">
-    </el-table-column> -->
+    <el-table-column label="操作" width="140">
+      <template slot-scope="{ row }">
+        <el-button type="primary" v-if="row.state === 0" size="mini" @click="startStocktaking(row.uniqueCode)">开始盘点</el-button>
+        <el-button type="primary" v-if="row.state === 1" size="mini" @click="enterResult(row)">录入结果</el-button>
+        <el-button type="primary" v-if="row.state === 2" size="mini" @click="modifyDB(row.uniqueCode)">生成出入库单</el-button>
+      </template>
+    </el-table-column>
   </el-table>
   <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
     :current-page="1" :page-sizes="pageInformation.pageSizes" :page-size="pageInformation.pageSize" layout="total, sizes, prev, pager, next, jumper"
@@ -109,6 +124,29 @@
       <el-button type="primary" size="media" @click="confirmAddGoods">确认</el-button>
     </el-row>
   </el-dialog>
+  <el-dialog title="盘点结果录入" :visible="isEnterDlgShow" center width="70%">
+    <el-form :model="enterFormData" ref="enterForm" label-width="0px" size="mini" class="enter-result-form">
+      <el-table size="mini" class="mb15" :data="enterFormData.goodsList">
+        <el-table-column label="商品编号" prop="uniqueCode" width="120"></el-table-column>
+        <el-table-column label="商品名称" prop="goodsName"></el-table-column>
+        <el-table-column label="库存数量" prop="amount"></el-table-column>
+        <el-table-column label="盘点量">
+          <template slot-scope="{ $index, row }">
+            <el-form-item :prop="`goodsList.${$index}.actualAmount`">
+              <el-input v-model.number="row.actualAmount" :rules="actualAmountRules" @change="handleActAmoChange($index)"></el-input>
+            </el-form-item>
+          </template>
+        </el-table-column>
+        <el-table-column label="盈亏量">
+          <template slot-scope="{ row }">{{row.gap}}</template>
+        </el-table-column>
+      </el-table>
+    </el-form>
+    <el-row slot="footer">
+      <el-button size="media" @click="cancelEnterResult">取消</el-button>
+      <el-button type="primary" size="media" @click="confirmEnterResult">确认</el-button>
+    </el-row>
+  </el-dialog>
 </div>
 </template>
 
@@ -116,6 +154,7 @@
 export default {
   data () {
     return {
+      username: '',
       queryForm: {
         uniqueCode: '',
         goodsUniqueCode: '',
@@ -135,11 +174,21 @@ export default {
         extra: '',
         goodsList: []
       },
-      focusedGoodsId: ''
+      focusedGoodsId: '',
+      // 盘点录入
+      enterFormData: {
+        uniqueCode: '',
+        goodsList: []
+      },
+      isEnterDlgShow: false,
+      actualAmountRules: [
+        { type: Number, message: '盘点量需为数值', trigger: 'blur' }
+      ]
     };
   },
   created () {
     this.getData();
+    this.username = sessionStorage.getItem('username');
   },
   methods: {
     handleSizeChange (size) {
@@ -227,14 +276,58 @@ export default {
     create () {
       this.isDlgShow = true;
     },
-    deleteSelection () {}
+    deleteSelection () {},
+    async startStocktaking (uniqueCode) {
+      await ajax.post('/wms/start-stocktaking', { uniqueCode, username: this.username });
+      this.$message({
+        type: 'success',
+        message: '更改状态成功'
+      });
+      this.getData();
+    },
+    enterResult (row) {
+      this.enterFormData.uniqueCode = row.uniqueCode;
+      this.enterFormData.goodsList = row.goodsList.map(v => {
+        return { 
+          uniqueCode: v.uniqueCode, goodsName: v.goodsName, id: v.id,
+          amount: v.amount, actualAmount: 0, gap: v.amount
+        };
+      });
+      this.isEnterDlgShow = true;
+
+    },
+    cancelEnterResult () {
+      this.isEnterDlgShow = false;
+      this.createFormData.goodsList = [];
+    },
+    confirmEnterResult () {
+      this.$refs['enterForm'].validate(async (valid) => {
+        if (valid) {
+          await ajax.post('/wms/enter-result', {
+            username: this.username,
+            ...this.enterFormData
+          });
+          this.$message({
+            type: 'success',
+            message: '录入成功'
+          });
+          this.isEnterDlgShow = false;
+          this.getData();
+        }
+      });
+    },
+    handleActAmoChange (index) {
+      let goods = this.enterFormData.goodsList[index];
+      this.enterFormData.goodsList[index].gap = goods.actualAmount - goods.amount;
+    },
+    modifyDB (uniqueCode) {},
   }
 };
 </script>
 <style lang="less" scoped>
 </style>
 <style lang="less">
-.transship-application {
+.stocktaking-application {
   .query-form {
     margin: 15px 0 0;
   }
@@ -245,16 +338,21 @@ export default {
     width: 85%;
   }
   .goods-name-popper {
-  li {
-    .name {
-      text-overflow: ellipsis;
-      overflow: hidden;
-    }
-    .unique-code {
-      font-size: 12px;
-      color: #b4b4b4;
+    li {
+      .name {
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+      .unique-code {
+        font-size: 12px;
+        color: #b4b4b4;
+      }
     }
   }
-}
+  .enter-result-form {
+    .el-form-item--mini.el-form-item, .el-form-item--small.el-form-item {
+      margin-bottom: 0;
+    }
+  }
 }
 </style>

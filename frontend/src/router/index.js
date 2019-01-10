@@ -32,8 +32,7 @@ import TransshipApplication from '@/views/wms/transshipment/application';
 import TransshipCheck from '@/views/wms/transshipment/check';
 import TransshipExecution from '@/views/wms/transshipment/execution';
 
-import Stocktaking from '@/views/wms/stocktaking/index';
-import StocktakingApplication from '@/views/wms/stocktaking/application';
+import Stocktaking from '@/views/wms/stocktaking/application';
 
 Vue.use(Router);
 const router = new Router({
@@ -81,6 +80,12 @@ const router = new Router({
               meta: { name: '入库管理', activeMenuItem: '/main/wms/stock-in-req' }
             },
             {
+              path: 'stocktaking',
+              component: Stocktaking,
+              name: 'stocktaking',
+              meta: { name: '盘点管理', activeMenuItem: '/main/wms/stocktaking' }
+            },
+            {
               path: 'goods-management',
               component: GoodsManagement,
               name: 'goods-management',
@@ -119,19 +124,25 @@ const router = new Router({
             }
           ]
         },
-        {
-          path: 'stocktaking',
-          component: Stocktaking,
-          meta: { name: '盘点管理' },
-          children: [
-            {
-              path: 'application',
-              component: StocktakingApplication,
-              name: 'stocktaking-application',
-              meta: { name: '盘点申请', activeMenuItem: '/main/stocktaking/application' }
-            }
-          ]
-        },
+        // {
+        //   path: 'stocktaking',
+        //   component: Stocktaking,
+        //   meta: { name: '盘点管理' },
+        //   children: [
+        //     {
+        //       path: 'application',
+        //       component: StocktakingApplication,
+        //       name: 'stocktaking-application',
+        //       meta: { name: '盘点开单', activeMenuItem: '/main/stocktaking/application' }
+        //     },
+        //     {
+        //       path: 'execution',
+        //       component: StocktakingApplication,
+        //       name: 'stocktaking-application',
+        //       meta: { name: '盘点开单', activeMenuItem: '/main/stocktaking/application' }
+        //     }
+        //   ]
+        // },
         {
           path: 'um',
           component: UM,
