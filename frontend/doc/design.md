@@ -37,3 +37,13 @@
       "inLayer" : "1"
   }]
 ```
+# 出库
+## 商品列表
+出库单的商品列表如下：
+```js
+{
+  uniqueCode: '',
+  goodsName: '',
+  amount: 0
+}
+```

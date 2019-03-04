@@ -57,7 +57,7 @@
         </el-row>
         <el-row justify="start" type="flex">
           <el-col :span="12"><el-form-item label="单价" prop="price"><el-input v-model="addGoodsForm.price" @change="calculateTotal"><i slot="prefix" class="fa fa-yen-sign"></i></el-input></el-form-item></el-col>
-          <el-col :span="12"><el-form-item label="数量" prop="amount"><el-input v-model="addGoodsForm.amount" @change="calculateTotal"></el-input></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="数量" prop="amount"><el-input v-model.number="addGoodsForm.amount" @change="calculateTotal"></el-input></el-form-item></el-col>
         </el-row>
         <el-row>
           <el-col :span="12"><el-form-item label="总价" prop="totalPrice"><el-input v-model="addGoodsForm.totalPrice" readonly ><i slot="prefix" class="fa fa-yen-sign"></i></el-input></el-form-item></el-col>
@@ -106,7 +106,8 @@ export default {
           { required: true, message: '请输入商品价格', trigger: 'blur' }
         ],
         amount: [
-          { required: true, message: '请输入商品数量', trigger: 'blur' }
+          { required: true, message: '请输入商品数量', trigger: 'blur' },
+          { type: 'number', message: '请输入数值', trigger: 'blue' }
         ],
         provider: [
           { required: true, message: '请输入商品供应商', trigger: 'blur' }

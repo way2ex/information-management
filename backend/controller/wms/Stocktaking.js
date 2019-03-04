@@ -1,4 +1,6 @@
 const Stocktaking = require('../../model/wms/Stocktaking');
+const StockinRequisition = require('../../model/wms/StockinRequisition');
+const Stockout = require('../../model/wms/Stockout');
 const { findManyGenerator } = require('../../common/utils');
 const dateTime = require('date-time');
 
@@ -68,10 +70,72 @@ async function enterResult (ctx) {
     msg: '更改状态成功'
   };
 }
+/**
+ * 生成出入库单
+ */
+async function createInAndOut (ctx) {
+  let { uniqueCode, username } = ctx.request.body;
+  let dataFromDB = await Stocktaking.findOne({ uniqueCode: uniqueCode });
+  let goodsList = dataFromDB.goodsList;
 
+  let baseUniqueCode = +new Date();
+  let stockinGoodsList = goodsList
+    .filter(v => v.gap > 0)
+    .map(v => ({
+      id: v.id,
+      uniqueCode: v.uniqueCode,
+      goodsName: v.goodsName,
+      amount: v.gap
+    }));
+  let stockoutGoodsList = goodsList
+    .filter(v => v.gap < 0)
+    .map(v => ({
+      id: v.id,
+      uniqueCode: v.uniqueCode,
+      goodsName: v.goodsName,
+      amount: v.amount,
+      outAmount: -v.gap
+    }));
+  if (stockinGoodsList.length) {
+    let newStockin = new StockinRequisition({
+      uniqueCode: baseUniqueCode,
+      goodsList: stockinGoodsList,
+      applicant: username,
+      applicatingDate: dateTime(),
+      state: 0,
+      stateText: '待处理',
+      processor: '',
+      extra: ''
+    });
+    await newStockin.save();
+  }
+  if (stockoutGoodsList.length) {
+    let newStockout = new Stockout({
+      uniqueCode: baseUniqueCode,
+      applicant: username,
+      applicatingDate: dateTime(),
+      goodsList: stockoutGoodsList,
+      state: 0,
+      stateText: '待处理',
+      resource: '盘点出库', resourceCode: 1,
+      processor: ''
+    });
+    await newStockout.save();
+  }
+
+  // await Stocktaking.update({ uniqueCode }, {
+  //   state: 3,
+  //   stateText: '已生成出入库申请'
+  // });
+  ctx.body = {
+    result: 1,
+    msg: '生成出入库申请已完成'
+  };
+}
 module.exports = {
   findMany,
   createOne,
   start,
-  enterResult
+  enterResult,
+  createInAndOut
 };

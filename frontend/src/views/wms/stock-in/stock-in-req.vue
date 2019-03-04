@@ -160,7 +160,7 @@ export default {
       });
     };
     return {
-      username: [],
+      username: '',
       tableData: [],
       lines: [],
       shelves: ['A', 'B'],

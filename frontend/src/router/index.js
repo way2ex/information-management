@@ -33,6 +33,7 @@ import TransshipCheck from '@/views/wms/transshipment/check';
 import TransshipExecution from '@/views/wms/transshipment/execution';
 
 import Stocktaking from '@/views/wms/stocktaking/application';
+import Stockout from '@/views/wms/stock-out/index';
 
 Vue.use(Router);
 const router = new Router({
@@ -84,6 +85,12 @@ const router = new Router({
               component: Stocktaking,
               name: 'stocktaking',
               meta: { name: '盘点管理', activeMenuItem: '/main/wms/stocktaking' }
+            },
+            {
+              path: 'stockout',
+              component: Stockout,
+              name: 'stockout',
+              meta: { name: '出库管理', activeMenuItem: '/main/wms/stockout' }
             },
             {
               path: 'goods-management',

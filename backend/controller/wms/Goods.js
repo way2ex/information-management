@@ -38,8 +38,24 @@ async function findManyWithFuzzy (ctx) {
   };
 }
 
+/**
+ * 根据编号列表获取商品
+ */
+async function findWithList (ctx) {
+  let { uniqueCodeList } = ctx.request.body;
+  let promiseArr = uniqueCodeList.map((uniqueCode) => {
+    return Goods.findOne({ uniqueCode });
+  });
+  let results = await Promise.all(promiseArr);
+  ctx.body = {
+    result: 1,
+    data: results
+  };
+}
+
 module.exports = {
   findMany,
   createOne,
-  findManyWithFuzzy
+  findManyWithFuzzy,
+  findWithList
 };

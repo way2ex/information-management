@@ -1,7 +1,7 @@
 <template>
 <div class="transship-application">
   <el-row justify="start" type="flex">
-    <el-button @click="create" type="primary">申请调拨</el-button>
+    <el-button @click="create">申请调拨</el-button>
   </el-row>
   <el-form inline :model="queryForm" class="query-form" size="small" label-width="70px">
     <el-row justify="start" type="flex">

@@ -1,7 +1,7 @@
 <template>
 <div class="stocktaking-application">
   <el-row justify="start" type="flex" class="mv10">
-    <el-button @click="create" type="primary">盘点开单</el-button>
+    <el-button @click="create">盘点开单</el-button>
   </el-row>
   <el-form inline :model="queryForm" class="query-form" size="small" label-width="70px">
     <el-row justify="start" type="flex">
@@ -71,7 +71,7 @@
       <template slot-scope="{ row }">
         <el-button type="primary" v-if="row.state === 0" size="mini" @click="startStocktaking(row.uniqueCode)">开始盘点</el-button>
         <el-button type="primary" v-if="row.state === 1" size="mini" @click="enterResult(row)">录入结果</el-button>
-        <el-button type="primary" v-if="row.state === 2" size="mini" @click="modifyDB(row.uniqueCode)">生成出入库单</el-button>
+        <el-button type="primary" v-if="row.state === 2" size="mini" @click="modifyDB(row.uniqueCode)">生成出入库申请</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -320,7 +320,14 @@ export default {
       let goods = this.enterFormData.goodsList[index];
       this.enterFormData.goodsList[index].gap = goods.actualAmount - goods.amount;
     },
-    modifyDB (uniqueCode) {},
+    async modifyDB (uniqueCode) {
+      await ajax.post('/wms/create-in-out', { uniqueCode, username: this.username });
+      this.$message({
+        message: '已生成出入库申请',
+        type: 'success'
+      });
+      this.getData();
+    },
   }
 };
 </script>
